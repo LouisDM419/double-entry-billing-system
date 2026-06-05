@@ -1,0 +1,17 @@
+[project]
+name = "billingledger"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "django>=6.0.6",
+    "django-environ>=0.13.0",
+    "django-redis>=7.0.0",
+    "psycopg2-binary>=2.9.12",
+    "pytest>=9.0.3",
+    "pytest-django>=4.12.0",
+    "redis>=8.0.0",
+    "strawberry-graphql-django>=0.86.0",
+    "strawberry-graphql[django]>=0.316.0",
+]

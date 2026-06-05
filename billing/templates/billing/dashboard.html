@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LedgerBill — Premium Billing Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #020617;
+            --card-bg: rgba(15, 23, 42, 0.45);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-green: #10b981;
+            --accent-green-glow: rgba(16, 185, 129, 0.15);
+            --accent-indigo: #6366f1;
+            --accent-indigo-glow: rgba(99, 102, 241, 0.15);
+            --accent-red: #ef4444;
+            --accent-red-glow: rgba(239, 68, 68, 0.15);
+            --font-family: 'Outfit', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 2.5rem;
+            overflow-x: hidden;
+        }
+
+        /* Ambient Glow Backgrounds */
+        .ambient-glow {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, rgba(2, 6, 17, 0) 70%);
+            top: -100px;
+            left: -100px;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .ambient-glow-2 {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, rgba(2, 6, 17, 0) 70%);
+            bottom: -200px;
+            right: -100px;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(16px);
+            padding: 1.5rem 2rem;
+            border-radius: 1.25rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .logo-container h1 {
+            font-size: 1.85rem;
+            font-weight: 800;
+            letter-spacing: -0.05em;
+            background: linear-gradient(135deg, #34d399 0%, #6366f1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.25rem;
+        }
+
+        .logo-container p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .btn {
+            font-family: var(--font-family);
+            font-size: 0.9rem;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-emerald {
+            background-color: var(--accent-green);
+            color: #ffffff;
+            box-shadow: 0 4px 14px var(--accent-green-glow);
+        }
+
+        .btn-emerald:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+            background-color: #059669;
+        }
+
+        .btn-indigo {
+            background-color: var(--accent-indigo);
+            color: #ffffff;
+            box-shadow: 0 4px 14px var(--accent-indigo-glow);
+        }
+
+        .btn-indigo:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3);
+            background-color: #4f46e5;
+        }
+
+        .btn-secondary {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background-color: var(--accent-red);
+            color: #ffffff;
+            box-shadow: 0 4px 14px var(--accent-red-glow);
+        }
+
+        .btn-danger:hover {
+            background-color: #dc2626;
+            transform: translateY(-1px);
+        }
+
+        main {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            flex: 1;
+        }
+
+        @media (max-width: 1024px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(12px);
+            border-radius: 1.25rem;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+            transition: border-color 0.3s;
+        }
+
+        .card:hover {
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+        }
+
+        input {
+            background-color: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--text-primary);
+            font-family: var(--font-family);
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.25s;
+            flex: 1;
+        }
+
+        input:focus {
+            border-color: var(--accent-indigo);
+            box-shadow: 0 0 0 3px var(--accent-indigo-glow);
+        }
+
+        .balance-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .balance-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .balance-card:hover {
+            background: rgba(255, 255, 255, 0.04);
+            transform: scale(1.02);
+        }
+
+        .balance-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .balance-val {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+        }
+
+        .val-revenue {
+            color: #818cf8;
+            text-shadow: 0 0 15px rgba(129, 140, 248, 0.2);
+        }
+
+        .val-customer {
+            color: #34d399;
+            text-shadow: 0 0 15px rgba(52, 211, 153, 0.2);
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+            transition: all 0.3s;
+        }
+
+        .badge-green {
+            background-color: var(--accent-green-glow);
+            color: var(--accent-green);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .badge-red {
+            background-color: var(--accent-red-glow);
+            color: var(--accent-red);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            animation: pulse-border 1.5s infinite alternate;
+        }
+
+        @keyframes pulse-border {
+            0% {
+                border-color: rgba(239, 68, 68, 0.3);
+                box-shadow: 0 0 0 0px rgba(239, 68, 68, 0.2);
+            }
+            100% {
+                border-color: rgba(239, 68, 68, 0.8);
+                box-shadow: 0 0 8px 2px rgba(239, 68, 68, 0.2);
+            }
+        }
+
+        .feed-container {
+            background: rgba(2, 6, 17, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 0.75rem;
+            flex: 1;
+            overflow-y: auto;
+            max-height: 250px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+
+        .feed-item {
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            border-left: 3px solid transparent;
+            animation: slide-in 0.2s ease-out;
+        }
+
+        @keyframes slide-in {
+            from {
+                transform: translateY(5px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .feed-success {
+            background: rgba(16, 185, 129, 0.05);
+            border-left-color: var(--accent-green);
+            color: #a7f3d0;
+        }
+
+        .feed-blocked {
+            background: rgba(239, 68, 68, 0.05);
+            border-left-color: var(--accent-red);
+            color: #fca5a5;
+        }
+
+        .feed-info {
+            background: rgba(99, 102, 241, 0.05);
+            border-left-color: var(--accent-indigo);
+            color: #c7d2fe;
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient-glow"></div>
+    <div class="ambient-glow-2"></div>
+
+    <header>
+        <div class="logo-container">
+            <h1>LedgerBill Engine</h1>
+            <p>Usage Metering & Double-Entry Accounting (GraphQL + REST)</p>
+        </div>
+        <div class="flex gap-4">
+            <button onclick="initializeAccounts()" class="btn btn-secondary">
+                🛠️ Init System Accounts
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <!-- Playground Column -->
+        <div class="card">
+            <h2 class="card-title">Billing Playground</h2>
+            
+            <!-- Credit Grant Form -->
+            <div class="form-group">
+                <label for="grantAmount">Add Credit to User Account (ID: 2)</label>
+                <div class="form-row">
+                    <input id="grantAmount" type="number" placeholder="Amount (e.g. 50)" min="1">
+                    <button onclick="grantCredits()" class="btn btn-indigo">
+                        Grant Credits
+                    </button>
+                </div>
+            </div>
+
+            <!-- Ingestion Event Simulation -->
+            <div class="form-group">
+                <label>Simulate Live Ingest Events</label>
+                <div class="form-row">
+                    <button onclick="sendIngestEvent()" class="btn btn-secondary" style="flex: 1;">
+                        ⚡ Single Event (Cost: 1 Token)
+                    </button>
+                    <button onclick="toggleAutoLoad()" id="btnAuto" class="btn btn-emerald" style="flex: 1;">
+                        🚀 Toggle Auto Load (10 ev/s)
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monitoring Column -->
+        <div class="card">
+            <h2 class="card-title">
+                Live Balances 
+                <span id="rateLimitBadge" class="badge badge-green">SYSTEM NORMAL</span>
+            </h2>
+
+            <div class="balance-grid">
+                <div class="balance-card">
+                    <div class="balance-label">Revenue Reserve Balance (ID: 1)</div>
+                    <div id="balRevenue" class="balance-val val-revenue">$0.00</div>
+                </div>
+                <div class="balance-card">
+                    <div class="balance-label">Customer Wallet Balance (ID: 2)</div>
+                    <div id="balCustomer" class="balance-val val-customer">$0.00</div>
+                </div>
+            </div>
+
+            <div class="form-group" style="flex: 1; display: flex; flex-direction: column;">
+                <label>Ingest Activity Feed</label>
+                <div id="feed" class="feed-container">
+                    <div class="feed-item feed-info">Ready to ingest events...</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let autoInterval = null;
+
+        // Custom logs feed
+        function logToFeed(message, type = 'info') {
+            const feed = document.getElementById('feed');
+            const item = document.createElement('div');
+            item.className = `feed-item feed-${type}`;
+            const time = new Date().toLocaleTimeString();
+            item.innerText = `[${time}] ${message}`;
+            feed.appendChild(item);
+            feed.scrollTop = feed.scrollHeight;
+            
+            // Limit elements to 50
+            while (feed.childNodes.length > 50) {
+                feed.removeChild(feed.firstChild);
+            }
+        }
+
+        async function graphQLRequest(query, variables = {}) {
+            const res = await fetch('/graphql', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ query, variables })
+            });
+            const body = await res.json();
+            if (body.errors) {
+                console.error(body.errors);
+                throw new Error(body.errors[0].message);
+            }
+            return body.data;
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        async function initializeAccounts() {
+            try {
+                // Initialize default accounts: ID 1 SystemRevenue, ID 2 CustomerWallet
+                const m1 = `mutation {
+                    createAccount(name: "SystemRevenue", accountType: "REVENUE") {
+                        id
+                    }
+                }`;
+                const m2 = `mutation {
+                    createAccount(name: "CustomerWallet", accountType: "LIABILITY") {
+                        id
+                    }
+                }`;
+                await graphQLRequest(m1);
+                await graphQLRequest(m2);
+                logToFeed("System accounts created! ID 1 = System Revenue, ID 2 = Customer Wallet", "info");
+                await updateBalances();
+            } catch (e) {
+                logToFeed("Initialization failed: " + e.message, "blocked");
+            }
+        }
+
+        async function grantCredits() {
+            const amountInput = document.getElementById('grantAmount');
+            const amount = parseFloat(amountInput.value);
+            if (!amount || amount <= 0) {
+                alert("Please enter a valid amount");
+                return;
+            }
+
+            try {
+                const query = `mutation Grant($accountId: Int!, $amount: Float!, $desc: String!) {
+                    grantCredits(accountId: $accountId, amount: $amount, description: $desc) {
+                        id
+                    }
+                }`;
+                await graphQLRequest(query, {
+                    accountId: 2,
+                    amount: amount,
+                    desc: "Standard top-up"
+                });
+                logToFeed(`Successfully granted $${amount.toFixed(2)} to Customer Wallet`, "info");
+                amountInput.value = '';
+                await updateBalances();
+            } catch (e) {
+                logToFeed("Failed to grant credits: " + e.message, "blocked");
+            }
+        }
+
+        async function sendIngestEvent() {
+            const badge = document.getElementById('rateLimitBadge');
+            try {
+                const res = await fetch('/api/ingest', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        customer_id: "customer_2",
+                        limit: 30
+                    })
+                });
+
+                const data = await res.json();
+
+                if (res.status === 429) {
+                    badge.innerText = "RATE LIMIT BLOCKED";
+                    badge.className = "badge badge-red";
+                    logToFeed(`Blocked: Ingest limit reached. Remaining tokens: ${data.remaining_tokens}`, "blocked");
+                } else if (res.status === 200) {
+                    badge.innerText = "SYSTEM NORMAL";
+                    badge.className = "badge badge-green";
+                    logToFeed(`Accepted: Usage event registered. Remaining tokens: ${data.remaining_tokens}`, "success");
+                } else {
+                    logToFeed(`Error: Received status code ${res.status}`, "blocked");
+                }
+            } catch (e) {
+                logToFeed("Network error ingesting event: " + e.message, "blocked");
+            }
+        }
+
+        function toggleAutoLoad() {
+            const btn = document.getElementById('btnAuto');
+            if (autoInterval) {
+                clearInterval(autoInterval);
+                autoInterval = null;
+                btn.innerText = "🚀 Toggle Auto Load (10 ev/s)";
+                btn.className = "btn btn-emerald";
+                logToFeed("Stopped continuous load simulation", "info");
+            } else {
+                autoInterval = setInterval(sendIngestEvent, 100);
+                btn.innerText = "⏹️ Stop Load Simulation";
+                btn.className = "btn btn-danger";
+                logToFeed("Started continuous load simulation (10 events/sec)", "info");
+            }
+        }
+
+        async function updateBalances() {
+            try {
+                const query = `query {
+                    revenue_bal: accountBalance(accountId: 1)
+                    customer_bal: accountBalance(accountId: 2)
+                }`;
+                const data = await graphQLRequest(query);
+                document.getElementById('balRevenue').innerText = "$" + data.revenue_bal.toFixed(2);
+                document.getElementById('balCustomer').innerText = "$" + data.customer_bal.toFixed(2);
+            } catch (e) {
+                // If accounts aren't initialized yet, ignore balance fetch error
+            }
+        }
+
+        // Poll balances every 1.5 seconds
+        setInterval(updateBalances, 1500);
+    </script>
+</body>
+</html>
