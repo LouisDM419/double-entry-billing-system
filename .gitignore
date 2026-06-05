@@ -13,6 +13,7 @@ env/
 # Databases & local environment
 db.sqlite3
 .env
+.env.example
 
 # Testing / coverage
 .pytest_cache/
